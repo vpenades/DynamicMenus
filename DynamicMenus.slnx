@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/examples/">
+    <File Path="examples/Directory.Build.props" />
+    <Project Path="examples/DynamicMenusDemo.AvaloniaApp/DynamicMenusDemo.AvaloniaApp.csproj" Id="243c3609-848e-4232-a388-a5bc6f83a954" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+    <Project Path="src/DynamicMenus.MVVM.Avalonia/DynamicMenus.MVVM.Avalonia.csproj" />
+    <Project Path="src/DynamicMenus.MVVM.Core/DynamicMenus.MVVM.Core.csproj" />
+  </Folder>
+</Solution>

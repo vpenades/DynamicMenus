@@ -1,51 +1,14 @@
-﻿# DynamicMenus
+﻿using System;
+using System.Collections.Generic;
 
-### Overview
+using CommunityToolkit.Mvvm.ComponentModel;
 
-This library adds useful MVVM classes to create context menus dynamically
+using DynamicMenus;
+using DynamicMenus.ViewModels;
 
-### Usage
-
-The `DynamicMenus.MVVM.Core` is the base, dependency free library that has most of the functionality,
-it's interface based, so it requires the target framework (Maui, Avalonia) to support interface DataTypes,
-so WPF is out.
-
-core interfaces:
-
-```csharp
-namespace DynamicMenus.ViewModels
+namespace DynamicMenusDemo.AvaloniaApp.ViewModels
 {
-	interface IMenuItemViewModel {}
-	interface IMenuItemGroupViewModel {}
-	interface IMenuItemCheckBoxViewModel {}
-	interface IMenuItemRadioButtonViewModel {}
-	interface IMenuItemCommandViewModel {}
-	interface IMenuItemSelfCommandViewModel {}
-	interface IMenuItemParamCommandViewModel {}
-}
-```
-
-Technically, you only need to implement these interfaces in your own ViewModels, and bind the properties to `DynamicContextMenu.ItemsSource`
-
-Then, you can bind a collection of `IMenuItemViewModel` view models to a `DynamicContextMenu`
-
-```xml
-<Button>
-	<Button.ContextMenu>
-		<DynamicContextMenu ItemsSource{Binding ModelContextMenu} />
-	</Button.ContextMenu>
-</Button>
-
-```
-
-#### using MenuBuilder
-
-Implementing all the interfaces can be painful, so I aso included predefined ModelViews, and a model builder that simplifies dynamic context menu creation
-
-Example:
-
-```csharp
-public partial class MainWindowViewModel : ViewModelBase
+    public partial class MainWindowViewModel : ViewModelBase
     {
         static MainWindowViewModel()
         {
@@ -97,6 +60,4 @@ public partial class MainWindowViewModel : ViewModelBase
         [ObservableProperty]
         private string? clipboardText = "Greetings!";
     }
-```
-
-
+}

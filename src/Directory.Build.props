@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>  
+
+  <!-- Legal =================================================================================== -->
+
+  <PropertyGroup>
+    <Authors>Vicente Penades</Authors>    
+    <Copyright>Copyright (c) $([System.DateTime]::Now.ToString(`yyyy`)) Vicente Penades</Copyright>
+    <Description>DynamicMenus provides MVVM MenuItems for UI Frameworks</Description>    
+  </PropertyGroup>  
+
+  <!-- Configuration =================================================================================== -->
+
+  <PropertyGroup>    
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>  
+
+  <PropertyGroup>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>  
+  
+  <!-- Packaging =================================================================================== -->  
+  
+  <PropertyGroup>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageTags>C# glTF 3D</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MsBuildThisFileDirectory)..\assets\icon.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/vpenades/DynamicMenus</RepositoryUrl>    
+    <PackageProjectUrl>https://github.com/vpenades/DynamicMenus</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>    
+  </PropertyGroup>  
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">    
+    <DebugSymbols>true</DebugSymbols>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>    
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>    
+  </PropertyGroup>    
+  
+</Project>
