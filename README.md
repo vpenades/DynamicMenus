@@ -1,5 +1,10 @@
 ﻿# DynamicMenus
 
+|Library|Nuget|Function|
+|-|-|-|
+|__DynamicMenus.MVVM.Core__|[![Nuget](https://img.shields.io/nuget/vpre/DynamicMenus.MVVM.Core)](https://www.nuget.org/packages/DynamicMenus.MVVM.Core)|Abstractions, shared ViewModels and Builders.|
+|__DynamicMenus.MVVM.Avalonia__|[![Nuget](https://img.shields.io/nuget/vpre/DynamicMenus.MVVM.Avalonia)](https://www.nuget.org/packages/DynamicMenus.MVVM.Avalonia)|Controls and Styles for Avalonia.|
+
 ### Overview
 
 This library adds useful MVVM classes to create context menus dynamically.
