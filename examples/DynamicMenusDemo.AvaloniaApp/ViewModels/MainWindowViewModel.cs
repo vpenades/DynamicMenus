@@ -12,6 +12,8 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
     {
         static MainWindowViewModel()
         {
+            // Before using the MenuBuilder we need to register the ICommand factory services:
+
             MenuBuilder.RegisterCommandsFactory(CommunityToolkitDynamicMenuServices.Instance);
             MenuBuilder.RegisterCommandsFactory(AvaloniaDynamicMenuServices.Instance);
         }
@@ -37,8 +39,8 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
             {
                 var builder = new MenuBuilder();
 
-                builder.Append("", "Copy from clipboard").WithCopyFromClipboard<string>(txt => ClipboardText = txt);
-                builder.Append("", "Copy to clipboard").WithCopyToClipboard<string>(() => ClipboardText);
+                builder.Append("📋", "Copy from clipboard").WithCopyFromClipboard<string>(txt => ClipboardText = txt);
+                builder.Append("🗐", "Copy to clipboard").WithCopyToClipboard<string>(() => ClipboardText);
 
                 return builder.EnumerateMenuItems();
             }

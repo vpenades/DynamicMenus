@@ -9,9 +9,18 @@ using DynamicMenus.ViewModels;
 
 namespace DynamicMenus
 {
-    [System.Diagnostics.DebuggerDisplay("{Icon} {Header}")]
+    [System.Diagnostics.DebuggerDisplay("{GetDebuggerDisplay()}")]
     public class MenuItemBuilder
     {
+        #region debugging
+
+        internal string GetDebuggerDisplay()
+        {
+            return _Factory?.GetDebuggerDisplay() ?? $"{Icon} {Header}";
+        }
+
+        #endregion
+
         #region lifecycle
 
         internal MenuItemBuilder(MenuBuilder context)

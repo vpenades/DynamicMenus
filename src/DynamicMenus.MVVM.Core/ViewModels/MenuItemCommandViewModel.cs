@@ -11,7 +11,7 @@ namespace DynamicMenus.ViewModels
     class MenuItemCommandViewModel : IMenuItemCommandViewModel
     {
         #region lifecycle
-
+        
         public sealed class Factory : MenuItemViewModelFactory
         {
             public Factory(MenuItemBuilder builder, ICommand command)
@@ -56,7 +56,7 @@ namespace DynamicMenus.ViewModels
     class MenuItemSelfCommandViewModel : IMenuItemSelfCommandViewModel
     {
         #region lifecycle
-
+        
         public sealed class Factory : MenuItemViewModelFactory
         {
             public Factory(MenuItemBuilder builder, ICommand command)
@@ -101,7 +101,7 @@ namespace DynamicMenus.ViewModels
     class MenuItemParamCommandViewModel<T> : IMenuItemParamCommandViewModel
     {
         #region lifecycle
-
+        
         public sealed class Factory : MenuItemViewModelFactory
         {
             public Factory(MenuItemBuilder builder, ICommand command, T? commandParameter)

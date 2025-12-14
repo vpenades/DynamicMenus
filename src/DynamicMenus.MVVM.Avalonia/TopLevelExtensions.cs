@@ -161,9 +161,6 @@ namespace DynamicMenus
             if (text == null) return;
 
             await cb.SetTextAsync(text);            
-        }
-
-
-        
+        }        
     }
 }

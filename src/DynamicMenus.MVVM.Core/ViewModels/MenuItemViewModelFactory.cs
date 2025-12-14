@@ -33,6 +33,14 @@ namespace DynamicMenus.ViewModels
         #endregion
 
         #region API
+
+        public virtual string GetDebuggerDisplay()
+        {
+            return Builder.Icon == null
+                ? $"{Builder.Header}"
+                : $"{Builder.Icon} {Builder.Header}";
+        }
+
         public abstract IMenuItemViewModel? Create();
 
         #endregion

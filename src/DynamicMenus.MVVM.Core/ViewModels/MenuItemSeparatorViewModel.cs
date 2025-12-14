@@ -11,17 +11,15 @@ namespace DynamicMenus.ViewModels
     /// Represents a MenuItem separator's view model.
     /// </summary>
     [System.Diagnostics.DebuggerDisplay("----------")]
-    sealed class MenuItemSeparatorViewModel : IMenuItemViewModel
-    {
+    sealed class MenuItemSeparatorViewModel : IMenuItemViewModel    
+    {        
         public sealed class Factory : MenuItemViewModelFactory
         {
             public Factory(MenuItemBuilder builder)
-                : base(builder) { }            
+                : base(builder) { }
 
-            public override IMenuItemViewModel? Create()
-            {
-                return Instance;
-            }
+            public override string GetDebuggerDisplay() { return "----------"; }
+            public override IMenuItemViewModel? Create() { return Instance; }
         }
 
         public static MenuItemSeparatorViewModel Instance { get; } = new MenuItemSeparatorViewModel();

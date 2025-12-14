@@ -23,7 +23,7 @@
   
   <PropertyGroup>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageTags>C# glTF 3D</PackageTags>
+    <PackageTags>MenuItem MVVM ViewModel Avalonia</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 

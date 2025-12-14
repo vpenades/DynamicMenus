@@ -10,7 +10,7 @@ namespace DynamicMenus.ViewModels
     sealed class MenuItemGroupViewModel : IMenuItemGroupViewModel
     {
         #region lifecycle
-
+        
         public sealed class Factory : MenuItemViewModelFactory
         {
             public Factory(MenuItemBuilder builder, MenuBuilder subMenu) : base(builder)

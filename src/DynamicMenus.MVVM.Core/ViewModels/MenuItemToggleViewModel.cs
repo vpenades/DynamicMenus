@@ -51,8 +51,11 @@ namespace DynamicMenus.ViewModels
     }
 
     [System.Diagnostics.DebuggerDisplay("{IsChecked} {Header}")]
-    sealed class MenuItemCheckBoxViewModel : MenuItemToggleViewModel, IMenuItemCheckBoxViewModel
+    sealed class MenuItemCheckBoxViewModel : MenuItemToggleViewModel, IMenuItemCheckBoxViewModel    
     {
+        #region lifecycle
+
+        [System.Diagnostics.DebuggerDisplay("☑ {Builder.Header}")]
         public sealed class Factory : MenuItemViewModelFactory
         {
             public Factory(MenuItemBuilder builder, Func<bool> getter, Action<bool> setter)
@@ -72,12 +75,17 @@ namespace DynamicMenus.ViewModels
         }
         private MenuItemCheckBoxViewModel(Factory args)
             : base(args, args.Getter, args.Setter) { }
+
+        #endregion
     }
 
 
     [System.Diagnostics.DebuggerDisplay("{IsChecked} {Header}")]
     sealed class MenuItemRadioButtonViewModel : MenuItemToggleViewModel, IMenuItemRadioButtonViewModel
     {
+        #region lifecycle
+
+        [System.Diagnostics.DebuggerDisplay("🔘 {Builder.Header}")]
         public sealed class Factory : MenuItemViewModelFactory
         {
             public Factory(MenuItemBuilder builder, string groupName, Func<bool> getter, Action<bool> setter)
@@ -103,6 +111,12 @@ namespace DynamicMenus.ViewModels
             GroupName = args.GroupName;
         }
 
+        #endregion
+
+        #region properties
+
         public string GroupName { get; }
+
+        #endregion
     }
 }
