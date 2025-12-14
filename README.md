@@ -25,7 +25,7 @@ namespace DynamicMenus.ViewModels
 }
 ```
 
-Technically, you only need to implement these interfaces in your own ViewModels, and bind the properties to `DynamicContextMenu.ItemsSource`
+Technically, you only need to implement these interfaces in your own ViewModels.
 
 Then, you can bind a collection of `IMenuItemViewModel` view models to a `DynamicContextMenu`
 
@@ -40,7 +40,7 @@ Then, you can bind a collection of `IMenuItemViewModel` view models to a `Dynami
 
 #### using MenuBuilder
 
-Implementing all the interfaces can be painful, so I aso included predefined ModelViews, and a model builder that simplifies dynamic context menu creation
+Implementing all the interfaces can be painful, so I aso included predefined interface implementations, and a model builder that simplifies dynamic context menu creation
 
 Example:
 
