@@ -2,7 +2,9 @@
 
 ### Overview
 
-This library adds useful MVVM classes to create context menus dynamically
+This library adds useful MVVM classes to create context menus dynamically.
+
+The primary target is Avalonia, but it is possible to include other frameworks (feel free to submit PRs)
 
 ### Usage
 
