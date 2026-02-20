@@ -46,6 +46,21 @@ namespace DynamicMenus
             throw new NotImplementedException();            
         }
 
+        public ICommand CreateGetClipboardCommand<T>(ICommandFactoryService cmdf, Func<T,Task> setValueFromClipboard)
+        {
+            if (typeof(T) == typeof(string))
+            {
+                async Task setText(string clipboardText)
+                {
+                    if (clipboardText is T value) await setValueFromClipboard(value);
+                }
+
+                return CreateTopLevelCommand(cmdf, top => top._CopyTextFromClipboard(setText));
+            }
+
+            throw new NotImplementedException();
+        }
+
         public ICommand CreateSetClipboardCommand<T>(ICommandFactoryService cmdf, Func<T?> getValueToCopyToClipboard)
         {
             if (typeof(T) == typeof(string))
@@ -53,6 +68,22 @@ namespace DynamicMenus
                 string getText()
                 {
                     var value = getValueToCopyToClipboard();
+                    return value as string ?? string.Empty;
+                }
+
+                return CreateTopLevelCommand(cmdf, top => top._CopyTextToClipboard(getText));
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public ICommand CreateSetClipboardCommand<T>(ICommandFactoryService cmdf, Func<Task<T?>> getValueToCopyToClipboard)
+        {
+            if (typeof(T) == typeof(string))
+            {
+                async Task<string> getText()
+                {
+                    var value = await getValueToCopyToClipboard();
                     return value as string ?? string.Empty;
                 }
 

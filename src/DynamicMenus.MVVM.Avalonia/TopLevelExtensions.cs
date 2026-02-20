@@ -42,6 +42,8 @@ namespace DynamicMenus
             return null;
         }
 
+        #region filesystem
+
         internal static async Task _FolderPickAsync<T>(this TopLevel top, Func<T, Task> folderPickAsyncAction)
         {
             var options = new Avalonia.Platform.Storage.FolderPickerOpenOptions();
@@ -143,6 +145,10 @@ namespace DynamicMenus
             throw new NotSupportedException($"{typeof(T).Name}");
         }
 
+        #endregion
+
+        #region clipboard
+
         internal static async Task _CopyTextFromClipboard(this TopLevel top, Action<string> textSetter)
         {
             var cb = top.Clipboard;
@@ -150,6 +156,15 @@ namespace DynamicMenus
 
             var text = await cb.TryGetTextAsync();
             if (text != null) textSetter.Invoke(text);
+        }
+
+        internal static async Task _CopyTextFromClipboard(this TopLevel top, Func<string, Task> textSetter)
+        {
+            var cb = top.Clipboard;
+            if (cb == null) return;
+
+            var text = await cb.TryGetTextAsync();
+            if (text != null) await textSetter.Invoke(text);
         }
 
         internal static async Task _CopyTextToClipboard(this TopLevel top, Func<string?> textGetter)
@@ -161,6 +176,19 @@ namespace DynamicMenus
             if (text == null) return;
 
             await cb.SetTextAsync(text);            
-        }        
+        }
+
+        internal static async Task _CopyTextToClipboard(this TopLevel top, Func<Task<string?>> textGetter)
+        {
+            var cb = top.Clipboard;
+            if (cb == null) return;
+
+            var text = await textGetter();
+            if (text == null) return;
+
+            await cb.SetTextAsync(text);
+        }
+
+        #endregion
     }
 }
