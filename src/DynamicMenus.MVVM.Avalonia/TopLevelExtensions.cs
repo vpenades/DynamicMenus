@@ -42,65 +42,70 @@ namespace DynamicMenus
             return null;
         }
 
-        #region filesystem
+        #region filesystem        
 
-        internal static async Task _FolderPickAsync<T>(this TopLevel top, Func<T, Task> folderPickAsyncAction)
+        internal static async Task _FolderPickAsync<T>(this TopLevel top, Avalonia.Platform.Storage.FolderPickerOpenOptions? options, Func<T, Task> folderPickAsyncAction)
         {
-            var options = new Avalonia.Platform.Storage.FolderPickerOpenOptions();
+            if (options == null)
+            {
+                options = new Avalonia.Platform.Storage.FolderPickerOpenOptions();                
+                options.Title = "Select Directory";
+            }
+
             options.AllowMultiple = false;
-            options.Title = "Select Directory";
 
             var folders = await top!.StorageProvider.OpenFolderPickerAsync(options);
             if (folders == null) return;
 
-            if (folders.Count == 1) await _ProcessFolderPickAsync(folders[0], folderPickAsyncAction);
+            if (!options.AllowMultiple && folders.Count == 1) await _ProcessSingleFolderPickAsync(folders[0], folderPickAsyncAction);
 
             foreach (var f in folders) { f.Dispose(); }
         }        
 
-        internal static async Task _OpenFileAsync<T>(this TopLevel top, Func<T, Task> openFileAsyncAction)
+        internal static async Task _OpenFileAsync<T>(this TopLevel top, Avalonia.Platform.Storage.FilePickerOpenOptions? options, Func<T, Task> openFileAsyncAction)
         {
-            var options = new Avalonia.Platform.Storage.FilePickerOpenOptions();
+            options ??= new Avalonia.Platform.Storage.FilePickerOpenOptions();
+
             options.AllowMultiple = false;
 
             var files = await top.StorageProvider.OpenFilePickerAsync(options);
             if (files == null) return;
 
-            if (files.Count == 1) await _ProcessFilePickAsync(files[0], openFileAsyncAction);
+            if (!options.AllowMultiple && files.Count == 1) await _ProcessSingleFilePickAsync(files[0], openFileAsyncAction);            
 
             foreach (var f in files) { f.Dispose(); }
         }        
 
-        internal static async Task _SaveFileAsync<T>(this TopLevel top, Func<T, Task> saveFileAsyncAction)
+        internal static async Task _SaveFileAsync<T>(this TopLevel top, Avalonia.Platform.Storage.FilePickerSaveOptions? options, Func<T, Task> saveFileAsyncAction)
         {
-            var options = new Avalonia.Platform.Storage.FilePickerSaveOptions();
+            options ??= new Avalonia.Platform.Storage.FilePickerSaveOptions();
 
             var file = await top.StorageProvider.SaveFilePickerAsync(options);
             if (file == null) return;
 
-            await _ProcessFilePickAsync(file, saveFileAsyncAction);
+            await _ProcessSingleFilePickAsync(file, saveFileAsyncAction);
 
             file.Dispose();
         }
 
-        private static async Task _ProcessFolderPickAsync<T>(IStorageFolder folder, Func<T,Task> folderPickAsyncAction)
+        private static async Task _ProcessSingleFolderPickAsync<T>(IStorageFolder folder, Func<T,Task> folderPickAsyncAction)
         {
             if (typeof(T) == typeof(IStorageFolder))
             {
                 var exact = System.Runtime.CompilerServices.Unsafe.As<IStorageFolder, T>(ref folder);
                 await folderPickAsyncAction.Invoke(exact);
                 return;
-            }
+            }            
 
             var path = folder.TryGetLocalPath();
             if (string.IsNullOrWhiteSpace(path)) return;
 
-            var result = _ConvertPath<T>(path);
+            var result = _ConvertPath<T>(path, typeof(FINFO));
 
             await folderPickAsyncAction.Invoke(result);
-        }
+        }        
 
-        private static async Task _ProcessFilePickAsync<T>(IStorageFile file, Func<T, Task> filePickAsyncAction)
+        private static async Task _ProcessSingleFilePickAsync<T>(IStorageFile file, Func<T, Task> filePickAsyncAction)
         {
             if (typeof(T) == typeof(IStorageFile))
             {
@@ -112,13 +117,17 @@ namespace DynamicMenus
             var path = file.TryGetLocalPath();
             if (string.IsNullOrWhiteSpace(path)) return;
 
-            var result = _ConvertPath<T>(path);
+            var result = _ConvertPath<T>(path, typeof(DINFO));
 
             await filePickAsyncAction.Invoke(result);        
         }
 
-        private static T _ConvertPath<T>(string path)
+        
+
+        private static T _ConvertPath<T>(string path, params Type[] unsupportedTypes)
         {
+            if (unsupportedTypes.Contains(typeof(T))) throw new NotSupportedException($"{typeof(T).Name}");
+
             if (typeof(T) == typeof(DINFO))
             {
                 var d = new DINFO(path);

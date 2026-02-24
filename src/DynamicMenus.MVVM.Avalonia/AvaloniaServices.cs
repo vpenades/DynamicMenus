@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 
 namespace DynamicMenus
 {
@@ -16,19 +17,25 @@ namespace DynamicMenus
 
         private AvaloniaDynamicMenuServices() { }
 
-        public ICommand CreateFolderPickerCommand<T>(ICommandFactoryService cmdf, Func<T,Task> folderPickAsyncAction)
+        public ICommand CreateFolderPickerCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> folderPickAsyncAction)
         {
-            return CreateTopLevelCommand(cmdf, top => top._FolderPickAsync(folderPickAsyncAction));
+            var options = new Avalonia.Platform.Storage.FolderPickerOpenOptions();
+            configure(new StorageDialogConfiguration(options));
+            return CreateTopLevelCommand(cmdf, top => top._FolderPickAsync(options, folderPickAsyncAction));
         }
 
-        public ICommand CreateFileOpenCommand<T>(ICommandFactoryService cmdf, Func<T,Task> openFileAsyncAction)
+        public ICommand CreateFileOpenCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> openFileAsyncAction)
         {
-            return CreateTopLevelCommand(cmdf, top => top._OpenFileAsync(openFileAsyncAction));
+            var options = new Avalonia.Platform.Storage.FilePickerOpenOptions();
+            configure(new StorageDialogConfiguration(options));
+            return CreateTopLevelCommand(cmdf, top => top._OpenFileAsync(options, openFileAsyncAction));
         }
 
-        public ICommand CreateFileSaveCommand<T>(ICommandFactoryService cmdf, Func<T,Task> saveFileAsyncAction)
+        public ICommand CreateFileSaveCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> saveFileAsyncAction)
         {
-            return CreateTopLevelCommand(cmdf, top => top._SaveFileAsync(saveFileAsyncAction));
+            var options = new Avalonia.Platform.Storage.FilePickerSaveOptions();
+            configure(new StorageDialogConfiguration(options));
+            return CreateTopLevelCommand(cmdf, top => top._SaveFileAsync(options, saveFileAsyncAction));
         }
 
         public ICommand CreateGetClipboardCommand<T>(ICommandFactoryService cmdf, Action<T> setValueFromClipboard)
@@ -97,5 +104,62 @@ namespace DynamicMenus
         {
             return cmdf.CreateCommand<Visual?>(visual => topLevelAction(visual._GetActualTopLevel()!));            
         }        
+    }
+
+    public static class StorageDialogConfigurationExtensions
+    {
+        public static StorageDialogConfiguration WithTitle(this StorageDialogConfiguration cfg, string title)
+        {
+            switch (cfg.Configuration)
+            {
+                case Avalonia.Platform.Storage.FilePickerOpenOptions read: read.Title = title; break;
+                case Avalonia.Platform.Storage.FilePickerSaveOptions write: write.Title = title; break;
+                case FolderPickerOpenOptions folder: folder.Title = title; break;
+            }
+
+            return cfg;
+        }
+
+        public static StorageDialogConfiguration WithAllFilesExt(this StorageDialogConfiguration cfg)
+        {
+            return WithExtension(cfg, "All Files", "*.*");
+        }
+
+        /// <summary>
+        /// Adds an extension filter
+        /// </summary>
+        /// <param name="cfg">The target extension</param>
+        /// <param name="name">The extension name</param>
+        /// <param name="extensions">List of extensions in GLOB format. I.e. "*.png" or "*.*".</param>
+        /// <returns>fluent</returns>
+        public static StorageDialogConfiguration WithExtension(this StorageDialogConfiguration cfg, string name, params string[] extensions)
+        {
+            if (extensions.Length == 0) extensions = new string[] { "*.*" };
+
+            var ft = new FilePickerFileType(name);
+            ft.Patterns = extensions;
+
+            static IReadOnlyList<FilePickerFileType> _add(IReadOnlyList<FilePickerFileType>? collection, FilePickerFileType item)
+            {
+                var list = collection as List<FilePickerFileType> ?? new List<FilePickerFileType>(collection ?? Enumerable.Empty<FilePickerFileType>());
+                list.Add(item);
+                return list;
+            }
+
+            switch (cfg.Configuration)
+            {
+                case Avalonia.Platform.Storage.FilePickerOpenOptions read:
+                    read.FileTypeFilter = _add(read.FileTypeFilter, ft);                    
+                    break;
+
+                case Avalonia.Platform.Storage.FilePickerSaveOptions write:
+                    write.FileTypeChoices = _add(write.FileTypeChoices, ft);
+                    break;
+                case Avalonia.Platform.Storage.FolderPickerOpenOptions:
+                    throw new InvalidOperationException("Not supported for folder picker");
+            }
+
+            return cfg;
+        }
     }
 }

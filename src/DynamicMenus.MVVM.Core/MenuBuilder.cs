@@ -142,9 +142,9 @@ namespace DynamicMenus
                 ?? throw new NotImplementedException($"{nameof(ICommandFactoryService)} not found.\r\nEither pass one to {nameof(MenuBuilder)}'s constructor,\r\nor register a default one with {nameof(MenuBuilder)}.{nameof(RegisterCommandsFactory)} at application startup.");
         }
 
-        internal ICommand _CreateFolderPickCommand<T>(Func<T, Task> folderPickAction) => GetStorageCommandFactory().CreateFolderPickerCommand(GetCommandFactory(), folderPickAction);
-        internal ICommand _CreateFileOpenCommand<T>(Func<T, Task> fileOpenAction) => GetStorageCommandFactory().CreateFileOpenCommand(GetCommandFactory(), fileOpenAction);
-        internal ICommand _CreateFileSaveCommand<T>(Func<T, Task> fileSaveAction) => GetStorageCommandFactory().CreateFileSaveCommand(GetCommandFactory(), fileSaveAction);
+        internal ICommand _CreateFolderPickCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> folderPickAction) => GetStorageCommandFactory().CreateFolderPickerCommand(GetCommandFactory(), configure, folderPickAction);
+        internal ICommand _CreateFileOpenCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> fileOpenAction) => GetStorageCommandFactory().CreateFileOpenCommand(GetCommandFactory(), configure, fileOpenAction);
+        internal ICommand _CreateFileSaveCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> fileSaveAction) => GetStorageCommandFactory().CreateFileSaveCommand(GetCommandFactory(), configure, fileSaveAction);
         private IStorageCommandFactoryService GetStorageCommandFactory()
         {
             return _Parent?.GetStorageCommandFactory()                

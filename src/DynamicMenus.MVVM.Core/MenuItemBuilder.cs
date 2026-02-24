@@ -90,21 +90,21 @@ namespace DynamicMenus
             return WithCustomMenuItemFactory(new MenuItemParamCommandViewModel<T>.Factory(this, command, parameter));
         }
 
-        public virtual MenuItemBuilder WithFolderPicker<T>(Func<T, Task> folderPickAction)
+        public virtual MenuItemBuilder WithFolderPicker<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> folderPickAction)
         {
-            var cmd = _Context._CreateFolderPickCommand(folderPickAction);
+            var cmd = _Context._CreateFolderPickCommand(configure, folderPickAction);
             return WithCustomMenuItemFactory(new MenuItemSelfCommandViewModel.Factory(this, cmd));
         }
 
-        public virtual MenuItemBuilder WithFileOpen<T>(Func<T, Task> openFileAction)
+        public virtual MenuItemBuilder WithFileOpen<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> openFileAction)
         {
-            var cmd = _Context._CreateFileOpenCommand(openFileAction);
+            var cmd = _Context._CreateFileOpenCommand(configure, openFileAction);
             return WithCustomMenuItemFactory(new MenuItemSelfCommandViewModel.Factory(this, cmd));
         }
 
-        public virtual MenuItemBuilder WithFileSave<T>(Func<T, Task> saveFileAction)
+        public virtual MenuItemBuilder WithFileSave<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> saveFileAction)
         {
-            var cmd = _Context._CreateFileSaveCommand(saveFileAction);
+            var cmd = _Context._CreateFileSaveCommand(configure, saveFileAction);
             return WithCustomMenuItemFactory(new MenuItemSelfCommandViewModel.Factory(this, cmd));
         }
 

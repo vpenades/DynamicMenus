@@ -34,7 +34,7 @@ namespace DynamicMenus
         /// <param name="cmdf">A MVVM <see cref="ICommand"/> factory.</param>
         /// <param name="folderPickAsyncAction">The action called after the user picks a folder.</param>
         /// <returns>A command instance.</returns>
-        ICommand CreateFolderPickerCommand<T>(ICommandFactoryService cmdf, Func<T, Task> folderPickAsyncAction);
+        ICommand CreateFolderPickerCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T, Task> folderPickAsyncAction);
 
         /// <summary>
         /// Creates a command when executed, it displays a file open pick dialog, then executes <paramref name="openFileAsyncAction"/>
@@ -43,7 +43,7 @@ namespace DynamicMenus
         /// <param name="cmdf">A MVVM <see cref="ICommand"/> factory.</param>
         /// <param name="openFileAsyncAction">The action called after the user picks a file.</param>
         /// <returns>A command instance.</returns>
-        ICommand CreateFileOpenCommand<T>(ICommandFactoryService cmdf, Func<T, Task> openFileAsyncAction);
+        ICommand CreateFileOpenCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T, Task> openFileAsyncAction);
 
         /// <summary>
         /// Creates a command when executed, it displays a file save pick dialog, then executes <paramref name="saveFileAsyncAction"/>
@@ -52,7 +52,17 @@ namespace DynamicMenus
         /// <param name="cmdf">A MVVM <see cref="ICommand"/> factory.</param>
         /// <param name="openFileAsyncAction">The action called after the user picks a file.</param>
         /// <returns>A command instance.</returns>
-        ICommand CreateFileSaveCommand<T>(ICommandFactoryService cmdf, Func<T, Task> saveFileAsyncAction);
+        ICommand CreateFileSaveCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T, Task> saveFileAsyncAction);
+    }
+
+    public readonly struct StorageDialogConfiguration
+    {
+        public StorageDialogConfiguration(object configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public Object Configuration { get; }
     }
 
     /// <summary>

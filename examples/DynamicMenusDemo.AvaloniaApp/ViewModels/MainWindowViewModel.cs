@@ -24,8 +24,9 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
             {
                 var builder = new MenuBuilder();
 
-                builder.Append("📂", "Open File...").WithFileOpen<System.IO.FileInfo>(async f => await System.Threading.Tasks.Task.CompletedTask);
-                builder.Append("💾", "Save File...").WithFileSave<System.IO.FileInfo>(async f => await System.Threading.Tasks.Task.CompletedTask);
+                builder.Append("📂", "Open File...").WithFileOpen<System.IO.FileInfo>(cfg => cfg.WithTitle("Open File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt(), async f => await System.Threading.Tasks.Task.CompletedTask);
+                builder.Append("💾", "Save File...").WithFileSave<System.IO.FileInfo>(cfg => cfg.WithTitle("Save File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt(), async f => await System.Threading.Tasks.Task.CompletedTask);
+                builder.Append("📁", "Pick directory...").WithFolderPicker<System.IO.DirectoryInfo>(cfg => cfg.WithTitle("Pick target folder"), async f => await System.Threading.Tasks.Task.CompletedTask);
                 builder.AppendSeparator();
                 builder.Append("🚪", "Exit").WithCommand(()=> Environment.Exit(0));                
 
