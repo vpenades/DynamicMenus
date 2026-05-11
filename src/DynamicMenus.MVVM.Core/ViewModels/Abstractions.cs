@@ -37,6 +37,8 @@ namespace DynamicMenus.ViewModels
         public Object? Header { get; }
         public Object? ToolTip { get; }
 
+        public string HeaderText => Header?.ToString() ?? string.Empty;
+
         public static IMenuItemViewModel Separator => MenuItemSeparatorViewModel.Instance;
 
         public bool TryFindInTree(Predicate<IMenuItemViewModel> predicate, [NotNullWhen(true)] out IMenuItemViewModel? result)
@@ -109,7 +111,7 @@ namespace DynamicMenus.ViewModels
     {
         string IMenuItemViewModel.StyleTag => "CheckBox";
         Object? IMenuItemViewModel.Icon => null;
-        public bool IsChecked { get; set; }
+        public bool? IsChecked { get; set; }
     }
 
     /// <summary>

@@ -18,15 +18,18 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
             MenuBuilder.RegisterCommandsFactory(AvaloniaDynamicMenuServices.Instance);
         }
 
+        [ObservableProperty]
+        private bool _Option1;
+
         public IEnumerable<IMenuItemViewModel> FileMenu
         {
             get
             {
                 var builder = new MenuBuilder();
 
-                builder.Append("📂", "Open File...").WithFileOpen<System.IO.FileInfo>(cfg => cfg.WithTitle("Open File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt(), async f => await System.Threading.Tasks.Task.CompletedTask);
-                builder.Append("💾", "Save File...").WithFileSave<System.IO.FileInfo>(cfg => cfg.WithTitle("Save File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt(), async f => await System.Threading.Tasks.Task.CompletedTask);
-                builder.Append("📁", "Pick directory...").WithFolderPicker<System.IO.DirectoryInfo>(cfg => cfg.WithTitle("Pick target folder"), async f => await System.Threading.Tasks.Task.CompletedTask);
+                builder.Append("📂", "Open File...").WithFileOpen<System.IO.FileInfo>(cfg => cfg.WithTitle("Open File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt(), async f => await System.Threading.Tasks.Task.CompletedTask).WithToolTip("Open File");
+                builder.Append("💾", "Save File...").WithFileSave<System.IO.FileInfo>(cfg => cfg.WithTitle("Save File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt(), async f => await System.Threading.Tasks.Task.CompletedTask).WithToolTip("Save File");
+                builder.Append("📁", "Pick directory...").WithFolderPicker<System.IO.DirectoryInfo>(cfg => cfg.WithTitle("Pick target folder"), async f => await System.Threading.Tasks.Task.CompletedTask).WithToolTip("Pick Folder"); ;
                 builder.AppendSeparator();
                 builder.Append("🚪", "Exit").WithCommand(()=> Environment.Exit(0));                
 
@@ -42,6 +45,8 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
 
                 builder.Append("📋", "Copy from clipboard").WithCopyFromClipboard<string>(txt => ClipboardText = txt);
                 builder.Append("🗐", "Copy to clipboard").WithCopyToClipboard<string>(() => ClipboardText);
+
+                builder.Append("Option").WithCheckBox(()=> Option1, v => Option1 = v ?? false);
 
                 return builder.EnumerateMenuItems();
             }

@@ -9,10 +9,10 @@ using System.Windows.Input;
 namespace DynamicMenus.ViewModels
 {
     [System.Diagnostics.DebuggerDisplay("{IsChecked} {Header}")]
-    abstract class MenuItemToggleViewModel
+    abstract class MenuItemToggleViewModel : IMenuItemViewModel
     {
         #region lifecycle
-        protected MenuItemToggleViewModel(MenuItemViewModelFactory args, Func<bool> getter, Action<bool> setter)
+        protected MenuItemToggleViewModel(MenuItemViewModelFactory args, Func<bool?> getter, Action<bool?> setter)
         {
             this.Icon = args.Builder.Icon;
             this.Header = args.Builder.Header;
@@ -26,8 +26,8 @@ namespace DynamicMenus.ViewModels
 
         #region data
 
-        private readonly Func<bool> _Getter;
-        private readonly Action<bool> _Setter;
+        private readonly Func<bool?> _Getter;
+        private readonly Action<bool?> _Setter;
 
         #endregion
 
@@ -35,7 +35,7 @@ namespace DynamicMenus.ViewModels
 
         public bool IsEnabled => true;
 
-        public bool IsChecked
+        public bool? IsChecked
         {
             get => _Getter.Invoke();
             set => _Setter.Invoke(value);
@@ -43,7 +43,7 @@ namespace DynamicMenus.ViewModels
 
         public object? Icon { get; private set; }
 
-        public object? Header { get; private set; }
+        public object? Header { get; private set; }        
 
         public object? ToolTip { get; private set; }
 
@@ -58,15 +58,15 @@ namespace DynamicMenus.ViewModels
         [System.Diagnostics.DebuggerDisplay("☑ {Builder.Header}")]
         public sealed class Factory : MenuItemViewModelFactory
         {
-            public Factory(MenuItemBuilder builder, Func<bool> getter, Action<bool> setter)
+            public Factory(MenuItemBuilder builder, Func<bool?> getter, Action<bool?> setter)
                 : base(builder)
             {
                 Getter = getter;
                 Setter= setter;
             }
 
-            public Func<bool> Getter { get; }
-            public Action<bool> Setter { get; }
+            public Func<bool?> Getter { get; }
+            public Action<bool?> Setter { get; }
 
             public override IMenuItemViewModel? Create()
             {
@@ -88,7 +88,7 @@ namespace DynamicMenus.ViewModels
         [System.Diagnostics.DebuggerDisplay("🔘 {Builder.Header}")]
         public sealed class Factory : MenuItemViewModelFactory
         {
-            public Factory(MenuItemBuilder builder, string groupName, Func<bool> getter, Action<bool> setter)
+            public Factory(MenuItemBuilder builder, string groupName, Func<bool?> getter, Action<bool?> setter)
                 : base(builder)
             {
                 GroupName = groupName;
@@ -97,8 +97,8 @@ namespace DynamicMenus.ViewModels
             }
 
             public string GroupName { get; }
-            public Func<bool> Getter { get; }
-            public Action<bool> Setter { get; }
+            public Func<bool?> Getter { get; }
+            public Action<bool?> Setter { get; }
 
             public override IMenuItemViewModel? Create()
             {

@@ -1,35 +1,55 @@
-<Window xmlns="https://github.com/avaloniaui"        
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:DynamicMenusDemo.AvaloniaApp.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:dynmenus="using:DynamicMenus.Controls"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="DynamicMenusDemo.AvaloniaApp.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="DynamicMenusDemo.AvaloniaApp">
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="using:DynamicMenusDemo.AvaloniaApp.ViewModels"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:dynmenus="using:DynamicMenus.Controls"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		x:Class="DynamicMenusDemo.AvaloniaApp.Views.MainWindow"
+		x:DataType="vm:MainWindowViewModel"
+		Icon="/Assets/avalonia-logo.ico"
+		Title="DynamicMenusDemo.AvaloniaApp">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+		to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainWindowViewModel/>
+	</Design.DataContext>
 
-    <DockPanel>
 
-        <Menu DockPanel.Dock="Top">
-			<dynmenus:DynamicMenuItem Header="File" ItemsSource="{Binding FileMenu}" />
-            <dynmenus:DynamicMenuItem Header="Edit" ItemsSource="{Binding EditMenu}" />
-            <dynmenus:DynamicMenuItem Header="About" ItemsSource="{Binding AboutMenu}" />
-        </Menu>		
+	<DockPanel>
 
-        <TextBox Text="{Binding ClipboardText}" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBox.ContextMenu>
-				<dynmenus:DynamicContextMenu ItemsSource="{Binding EditMenu}" />
-            </TextBox.ContextMenu>
-        </TextBox>        
+		<CommandBar DockPanel.Dock="Top"
+					IsDynamicOverflowEnabled="True"
+					PrimaryCommands="{Binding FileMenu, Converter={x:Static dynmenus:CommandBarConverter.Default}}"
+					SecondaryCommands="{Binding EditMenu, Converter={x:Static dynmenus:CommandBarConverter.Default}}">
 
-    </DockPanel>    
+			<CommandBar.Content>
+				<Menu>
+					<dynmenus:DynamicMenuItem Header="File" ItemsSource="{Binding FileMenu}" />
+					<dynmenus:DynamicMenuItem Header="Edit" ItemsSource="{Binding EditMenu}" />
+					<dynmenus:DynamicMenuItem Header="About" ItemsSource="{Binding AboutMenu}" />
+				</Menu>
+			</CommandBar.Content>
+
+		</CommandBar>
+
+		<StackPanel Margin="4">
+
+			<GroupBox Header="EditMenu">
+				<TextBox Text="{Binding ClipboardText}" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<TextBox.ContextMenu>
+						<dynmenus:DynamicContextMenu ItemsSource="{Binding EditMenu}" />
+					</TextBox.ContextMenu>
+				</TextBox>
+			</GroupBox>
+
+			<GroupBox Header="Option1">
+				<TextBlock Text="{Binding Option1}" />	
+			</GroupBox>			
+
+		</StackPanel>
+
+	</DockPanel>
 
 </Window>

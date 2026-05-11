@@ -65,11 +65,11 @@ namespace DynamicMenus
         public MenuItemBuilder WithToolTip(object? toolTip) { this.ToolTip = toolTip; return this; }
 
 
-        public MenuItemBuilder WithCheckBox(Func<bool> getter, Action<bool> setter)
+        public MenuItemBuilder WithCheckBox(Func<bool?> getter, Action<bool?> setter)
         {
             return WithCustomMenuItemFactory(new MenuItemCheckBoxViewModel.Factory(this, getter, setter));
         }
-        public MenuItemBuilder WithRadioButton(string groupName, Func<bool> getter, Action<bool> setter)
+        public MenuItemBuilder WithRadioButton(string groupName, Func<bool?> getter, Action<bool?> setter)
         {
             return WithCustomMenuItemFactory(new MenuItemRadioButtonViewModel.Factory(this, groupName, getter, setter));
         }
