@@ -107,7 +107,8 @@ namespace DynamicMenus.ViewModels
             public Factory(MenuItemBuilder builder, ICommand command, T? commandParameter)
                 : base(builder)
             {
-                Command = command;
+                this.Command = command;
+                this.CommandParameter = commandParameter;
             }
 
             public ICommand Command { get; }
