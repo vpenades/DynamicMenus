@@ -4,12 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Avalonia;
 using Avalonia.Controls;
-
-using DynamicMenus.MenuStyles;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Templates;
 
 namespace DynamicMenus.Controls
 {
+    /// <summary>
+    /// Represents a <see cref="MenuItem"/> with additional styles able to handle view models.
+    /// </summary>
+    /// <example>
+    /// &gt;MenuItem ItemsSource="{Binding MenuViewModels}" &lt;>
+    /// </example>
+    public class DynamicMenuItem : MenuItem
+    {
+        public DynamicMenuItem()
+        {
+            MenuItemBindings.Attach(this);
+        }
+
+        protected override Type StyleKeyOverride => typeof(MenuItem);
+    }
+
     /// <summary>
     /// Represents a <see cref="Menu"/> with additional styles able to handle view models.
     /// </summary>
@@ -20,9 +37,7 @@ namespace DynamicMenus.Controls
     {
         public DynamicMenu()
         {
-            var style = new DynamicMenuStyles();
-
-            this.Styles.Add(style);
+            MenuItemBindings.Attach(this);
         }
 
         protected override Type StyleKeyOverride => typeof(Menu);
@@ -38,29 +53,27 @@ namespace DynamicMenus.Controls
     {
         public DynamicContextMenu()
         {
-            var style = new DynamicMenuStyles();
-
-            this.Styles.Add(style);
+            MenuItemBindings.Attach(this);
         }
 
         protected override Type StyleKeyOverride => typeof(ContextMenu);
     }
 
-    /// <summary>
-    /// Represents a <see cref="MenuItem"/> with additional styles able to handle view models.
-    /// </summary>
-    /// <example>
-    /// &gt;MenuItem ItemsSource="{Binding MenuViewModels}" &lt;>
-    /// </example>
-    public class DynamicMenuItem : MenuItem
+    public class DynamicMenuFlyout : MenuFlyout
     {
-        public DynamicMenuItem()
+        protected override Control CreatePresenter()
         {
-            var style = new DynamicMenuStyles();
+            var presenter = base.CreatePresenter();            
 
-            this.Styles.Add(style);
-        }
+            if (presenter is MenuFlyoutPresenter mfpresenter)
+            {
+                MenuItemBindings.Attach(mfpresenter);
+            }            
 
-        protected override Type StyleKeyOverride => typeof(MenuItem);
+            return presenter;
+        }        
     }
+
+
+    
 }

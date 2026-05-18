@@ -11,6 +11,25 @@ This library adds useful MVVM classes to create context menus dynamically.
 
 The primary target is Avalonia, but it is possible to include other frameworks (feel free to submit PRs)
 
+### The problem
+
+When using the MVVM pattern, the intuitive solution to bind Menus views to their respective ViewModels is by using a data template
+
+```xml
+<DataTemplate x:DataType="SomeMenuItemViewModel">
+   <MenuItem Icon="{Binding Icon}" Header="{Binding Header}" Command="{Binding Command}" />
+</DataTemplate>
+```
+
+And people discovers that this does not work. The reason being the way in which a MenuItem populates its items.
+
+An additional problem that has shown up is the new `CommandBar` which uses its own specialised items.
+
+
+This library addresses both issues by defining a number of MVVM interfaces, and a mechanism to connect them to both the classic Menus and the new CommandBar.
+
+
+
 ### Usage
 
 The `DynamicMenus.MVVM.Core` is the base, dependency free library that has most of the functionality,

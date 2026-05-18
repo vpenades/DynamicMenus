@@ -47,6 +47,8 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
                 builder.Append("🗐", "Copy to clipboard").WithCopyToClipboard<string>(() => ClipboardText);
 
                 builder.Append("Option").WithCheckBox(()=> Option1, v => Option1 = v ?? false);
+                builder.UseGroup("EXTRAS","☰", "Group").Append("Option 2").WithCheckBox(() => Option1, v => Option1 = v ?? false);
+                builder.UseGroup("EXTRAS").Append("🗐", "Copy to clipboard").WithCopyToClipboard<string>(() => ClipboardText);
 
                 return builder.EnumerateMenuItems();
             }

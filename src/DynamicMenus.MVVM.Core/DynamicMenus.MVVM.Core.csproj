@@ -7,8 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-	<ItemGroup>
-		<InternalsVisibleTo Include="DynamicMenus.MVVM.Avalonia"/>
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DynamicMenus.MVVM.Abstractions\DynamicMenus.MVVM.Abstractions.csproj" />
+  </ItemGroup>	
 
 </Project>

@@ -44,6 +44,8 @@ namespace DynamicMenus
 
         private readonly MenuBuilder? _Parent;
 
+        private string? _Id;
+
         private readonly ICommandFactoryService? _CommandFactory;
         private static ICommandFactoryService? _DefaultCommandFactory;
         private static IStorageCommandFactoryService? _DefaultStorageCommandFactory;
@@ -77,7 +79,7 @@ namespace DynamicMenus
             builder.Header = header;
             _Items.Add(builder);
             return builder;
-        }
+        }        
 
         public MenuBuilder AppendGroup(object? header)
         {
@@ -100,6 +102,37 @@ namespace DynamicMenus
             builder.MakeGroup(subMenu);
             _Items.Add(builder);
             return subMenu;
+        }
+
+        public MenuBuilder UseGroup(string id, object? icon = null, object? header = null)
+        {
+            var (item,menu) = _FindGroup(id);
+
+            if (item != null)
+            {
+                if (icon != null) item.Icon = icon;
+                if (header != null) item.Header = header;
+            }
+
+            if (menu == null)
+            {
+                menu ??= AppendGroup(icon, header);
+                menu._Id = id;
+            }
+
+            return menu;
+        }
+
+        private (MenuItemBuilder? owner, MenuBuilder? menu) _FindGroup(string id)
+        {
+            if (this._Id == id) return (null, this);
+
+            foreach (var item in _Items)
+            {
+                if (item._SubMenu?._Id == id) return (item, item._SubMenu);
+            }
+
+            return (null, null);
         }
 
         public void AppendSeparator()

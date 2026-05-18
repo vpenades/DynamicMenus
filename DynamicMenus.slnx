@@ -9,6 +9,7 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
+    <Project Path="src/DynamicMenus.MVVM.Abstractions/DynamicMenus.MVVM.Abstractions.csproj" Id="a45789b0-9332-4366-b546-655e063b7cb3" />
     <Project Path="src/DynamicMenus.MVVM.Avalonia/DynamicMenus.MVVM.Avalonia.csproj" />
     <Project Path="src/DynamicMenus.MVVM.Core/DynamicMenus.MVVM.Core.csproj" />
   </Folder>

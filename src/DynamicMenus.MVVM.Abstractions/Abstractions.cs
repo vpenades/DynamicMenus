@@ -23,23 +23,12 @@ namespace DynamicMenus.ViewModels
     /// </remarks>
     public interface IMenuItemViewModel
     {
-        /// <summary>
-        /// This is used to determine which style to apply to the MenuItem
-        /// </summary>
-        /// <remarks>
-        /// This is a hack used by Avalonia to define the MenuItem styles.
-        /// Other frameworks may not require using this and could rely on the DataType.
-        /// </remarks>
-        internal string StyleTag => "Default";
-
         public bool IsEnabled { get; }
         public Object? Icon { get; }
         public Object? Header { get; }
         public Object? ToolTip { get; }
 
-        public string HeaderText => Header?.ToString() ?? string.Empty;
-
-        public static IMenuItemViewModel Separator => MenuItemSeparatorViewModel.Instance;
+        public bool IsSeparator => Header is string hdr && hdr == "-";        
 
         public bool TryFindInTree(Predicate<IMenuItemViewModel> predicate, [NotNullWhen(true)] out IMenuItemViewModel? result)
         {
@@ -65,6 +54,9 @@ namespace DynamicMenus.ViewModels
         }        
     }
 
+    public interface IMenuItemSeparator : IMenuItemViewModel { }
+
+
     /// <summary>
     /// Represents a collection of <see cref="IMenuItemViewModel"/>
     /// </summary>
@@ -79,9 +71,7 @@ namespace DynamicMenus.ViewModels
         public static IMenuItemGroupViewModel CreateGroup(object? icon, object? header, IEnumerable<IMenuItemViewModel> items)
         {
             return new MenuItemGroupViewModel(icon, header, items);
-        }
-
-        string IMenuItemViewModel.StyleTag => "Group";
+        }        
 
         public IReadOnlyList<IMenuItemViewModel> Children { get; }
 
@@ -109,7 +99,6 @@ namespace DynamicMenus.ViewModels
     /// </summary>
     public interface IMenuItemCheckBoxViewModel : IMenuItemViewModel
     {
-        string IMenuItemViewModel.StyleTag => "CheckBox";
         Object? IMenuItemViewModel.Icon => null;
         public bool? IsChecked { get; set; }
     }
@@ -119,7 +108,6 @@ namespace DynamicMenus.ViewModels
     /// </summary>
     public interface IMenuItemRadioButtonViewModel : IMenuItemCheckBoxViewModel
     {
-        string IMenuItemViewModel.StyleTag => "RadioButton";        
         public string GroupName { get; }        
     }
 
@@ -132,7 +120,6 @@ namespace DynamicMenus.ViewModels
     public interface IMenuItemCommandViewModel
         : IMenuItemViewModel
     {
-        string IMenuItemViewModel.StyleTag => "Command";
         public ICommand Command { get; }
         public void Execute() { Command.Execute(null); }
     }
@@ -146,8 +133,6 @@ namespace DynamicMenus.ViewModels
     public interface IMenuItemSelfCommandViewModel
         : IMenuItemCommandViewModel
     {
-        string IMenuItemViewModel.StyleTag => "CommandWithSelf";        
-
         public new void Execute() { throw new NotSupportedException("Requires being called from UI"); }
     }
 
@@ -160,8 +145,6 @@ namespace DynamicMenus.ViewModels
     public interface IMenuItemParamCommandViewModel
         : IMenuItemCommandViewModel
     {
-        string IMenuItemViewModel.StyleTag => "CommandWithParam";
-        
         public Object? CommandParameter { get; }
 
         public new void Execute() { Command?.Execute(CommandParameter); }

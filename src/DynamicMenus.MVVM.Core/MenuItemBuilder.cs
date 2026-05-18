@@ -40,6 +40,7 @@ namespace DynamicMenus
         internal void MakeGroup(MenuBuilder subMenu)
         {
             _Factory = new MenuItemGroupViewModel.Factory(this, subMenu);
+            _SubMenu = subMenu;
         }
 
         #endregion
@@ -55,6 +56,7 @@ namespace DynamicMenus
         public object? ToolTip { get; set; }
 
         private MenuItemViewModelFactory? _Factory;
+        internal MenuBuilder? _SubMenu;
 
         #endregion
 

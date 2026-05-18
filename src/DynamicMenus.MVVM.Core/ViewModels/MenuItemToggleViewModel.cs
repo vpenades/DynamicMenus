@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Windows.Input;
 namespace DynamicMenus.ViewModels
 {
     [System.Diagnostics.DebuggerDisplay("{IsChecked} {Header}")]
-    abstract class MenuItemToggleViewModel : IMenuItemViewModel
+    abstract class MenuItemToggleViewModel : IMenuItemViewModel , INotifyPropertyChanged
     {
         #region lifecycle
         protected MenuItemToggleViewModel(MenuItemViewModelFactory args, Func<bool?> getter, Action<bool?> setter)
@@ -31,21 +32,30 @@ namespace DynamicMenus.ViewModels
 
         #endregion
 
-        #region properties            
+        #region properties
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private static readonly PropertyChangedEventArgs _IsCheckedArgs = new PropertyChangedEventArgs(nameof(IsChecked));
 
         public bool IsEnabled => true;
 
         public bool? IsChecked
         {
             get => _Getter.Invoke();
-            set => _Setter.Invoke(value);
+            set
+            {
+                if (value == _Getter.Invoke()) return;
+                _Setter.Invoke(value);                
+                PropertyChanged?.Invoke(this, _IsCheckedArgs);
+            }
         }
 
         public object? Icon { get; private set; }
 
         public object? Header { get; private set; }        
 
-        public object? ToolTip { get; private set; }
+        public object? ToolTip { get; private set; }        
 
         #endregion
     }

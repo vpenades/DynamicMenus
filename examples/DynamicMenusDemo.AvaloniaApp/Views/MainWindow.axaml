@@ -36,17 +36,42 @@
 
 		<StackPanel Margin="4">
 
-			<GroupBox Header="EditMenu">
-				<TextBox Text="{Binding ClipboardText}" HorizontalAlignment="Center" VerticalAlignment="Center">
-					<TextBox.ContextMenu>
-						<dynmenus:DynamicContextMenu ItemsSource="{Binding EditMenu}" />
-					</TextBox.ContextMenu>
-				</TextBox>
-			</GroupBox>
+			<GroupBox Header="Menus">
 
-			<GroupBox Header="Option1">
-				<TextBlock Text="{Binding Option1}" />	
-			</GroupBox>			
+				<WrapPanel>
+
+					<Label Content="Context Menu (right click)">
+						<Label.ContextMenu>
+							<dynmenus:DynamicContextMenu ItemsSource="{Binding EditMenu}" />
+						</Label.ContextMenu>
+					</Label>
+
+					<Button Content="Flyout menu (left click)">
+						<Button.Flyout>
+							<dynmenus:DynamicMenuFlyout ItemsSource="{Binding EditMenu}" />
+						</Button.Flyout>
+					</Button>
+				
+				</WrapPanel>		
+				
+			</GroupBox>		
+
+
+			<GroupBox Header="States">
+
+				<WrapPanel>
+
+					<GroupBox Header="Clipboard text">
+						<TextBox Text="{Binding ClipboardText}" />		
+					</GroupBox>					
+
+					<GroupBox Header="Option1">
+						<TextBlock Text="{Binding Option1}" />	
+					</GroupBox>
+
+				</WrapPanel>
+
+			</GroupBox>		
 
 		</StackPanel>
 
