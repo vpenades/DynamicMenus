@@ -50,14 +50,12 @@ namespace DynamicMenus
             {
                 options = new Avalonia.Platform.Storage.FolderPickerOpenOptions();                
                 options.Title = "Select Directory";
-            }
-
-            options.AllowMultiple = false;
+            }            
 
             var folders = await top!.StorageProvider.OpenFolderPickerAsync(options);
             if (folders == null) return;
 
-            if (!options.AllowMultiple && folders.Count == 1) await _ProcessSingleFolderPickAsync(folders[0], folderPickAsyncAction);
+            await _ProcessFolderPickAsync(folders, folderPickAsyncAction);
 
             foreach (var f in folders) { f.Dispose(); }
         }        
@@ -71,7 +69,7 @@ namespace DynamicMenus
             var files = await top.StorageProvider.OpenFilePickerAsync(options);
             if (files == null) return;
 
-            if (!options.AllowMultiple && files.Count == 1) await _ProcessSingleFilePickAsync(files[0], openFileAsyncAction);            
+            if (!options.AllowMultiple && files.Count == 1) await _ProcessFilePickAsync(files, openFileAsyncAction);            
 
             foreach (var f in files) { f.Dispose(); }
         }        
@@ -83,76 +81,74 @@ namespace DynamicMenus
             var file = await top.StorageProvider.SaveFilePickerAsync(options);
             if (file == null) return;
 
-            await _ProcessSingleFilePickAsync(file, saveFileAsyncAction);
+            await _ProcessFilePickAsync([file] , saveFileAsyncAction);
 
             file.Dispose();
         }
 
-        private static async Task _ProcessSingleFolderPickAsync<T>(IStorageFolder folder, Func<T,Task> folderPickAsyncAction)
+        private static async Task _ProcessFolderPickAsync<T>(IReadOnlyCollection<IStorageFolder> folders, Func<T,Task> folderPickAsyncAction)
         {
-            if (typeof(T) == typeof(IStorageFolder))
+            if (folders == null || folders.Count == 0) return;
+
+            async Task<bool> tryInvoke<TT>(TT value)
             {
-                var exact = System.Runtime.CompilerServices.Unsafe.As<IStorageFolder, T>(ref folder);
-                await folderPickAsyncAction.Invoke(exact);
-                return;
-            }            
-
-            var path = folder.TryGetLocalPath();
-            if (string.IsNullOrWhiteSpace(path)) return;
-
-            var result = _ConvertPath<T>(path, typeof(FINFO));
-
-            await folderPickAsyncAction.Invoke(result);
-        }        
-
-        private static async Task _ProcessSingleFilePickAsync<T>(IStorageFile file, Func<T, Task> filePickAsyncAction)
-        {
-            if (typeof(T) == typeof(IStorageFile))
-            {
-                var exact = System.Runtime.CompilerServices.Unsafe.As<IStorageFile, T>(ref file);
-                await filePickAsyncAction.Invoke(exact);
-                return;
+                if (value is null) return false;
+                if (value is not T compatibleValue) return false;
+                await folderPickAsyncAction(compatibleValue); return true;
             }
 
-            var path = file.TryGetLocalPath();
-            if (string.IsNullOrWhiteSpace(path)) return;
+            if (await tryInvoke( folders) ) return;
+            if (await tryInvoke( folders.FirstOrDefault() )) return;
+            if (await tryInvoke( _ToDirectoryInfo(folders.FirstOrDefault()) )) return;
+            if (await tryInvoke( folders.Select(_ToDirectoryInfo).OfType<DINFO>().ToArray() )) return;
+            if (await tryInvoke( _ToDirectoryInfo(folders.FirstOrDefault())?.FullName )) return;
 
-            var result = _ConvertPath<T>(path, typeof(DINFO));
-
-            await filePickAsyncAction.Invoke(result);        
+            throw new InvalidOperationException($"unable to cast collection of {typeof(IStorageFolder).Name} into {typeof(T).Name}");
         }
-
         
 
-        private static T _ConvertPath<T>(string path, params Type[] unsupportedTypes)
+        private static async Task _ProcessFilePickAsync<T>(IReadOnlyCollection<IStorageFile> files, Func<T, Task> filePickAsyncAction)
         {
-            if (unsupportedTypes.Contains(typeof(T))) throw new NotSupportedException($"{typeof(T).Name}");
+            if (files == null || files.Count == 0) return;
 
-            if (typeof(T) == typeof(DINFO))
+            async Task<bool> tryInvoke<TT>(TT value)
             {
-                var d = new DINFO(path);
-                return System.Runtime.CompilerServices.Unsafe.As<DINFO, T>(ref d);
+                if (value is null) return false;
+                if (value is not T compatibleValue) return false;
+                await filePickAsyncAction(compatibleValue); return true;
             }
 
-            if (typeof(T) == typeof(FINFO))
-            {
-                var f = new FINFO(path);
-                return System.Runtime.CompilerServices.Unsafe.As<FINFO, T>(ref f);
-            }
+            if (await tryInvoke( files )) return;
+            if (await tryInvoke( files.FirstOrDefault() )) return;
+            if (await tryInvoke( _ToFileInfo(files.FirstOrDefault()) )) return;
+            if (await tryInvoke( files.Select(_ToFileInfo).OfType<FINFO>().ToArray() )) return;
+            if (await tryInvoke( _ToFileInfo(files.FirstOrDefault())?.FullName )) return;
 
-            if (typeof(T) == typeof(Uri))
-            {
-                var uri = new Uri(path);
-                return System.Runtime.CompilerServices.Unsafe.As<Uri, T>(ref uri);
-            }
-
-            if (typeof(T) == typeof(string))
-            {
-                return System.Runtime.CompilerServices.Unsafe.As<string, T>(ref path);
-            }
-
-            throw new NotSupportedException($"{typeof(T).Name}");
+            throw new InvalidOperationException($"unable to cast collection of {typeof(IStorageFile).Name} into {typeof(T).Name}");
         }
+
+
+        private static FINFO? _ToFileInfo(IStorageFile? folder)
+        {
+            if (folder == null) return null;
+            var path = folder.TryGetLocalPath();
+            return string.IsNullOrWhiteSpace(path)
+                ? null
+                : new FINFO(path);
+        }
+
+        private static DINFO? _ToDirectoryInfo(IStorageFolder? folder)
+        {
+            if (folder == null) return null;
+            var path = folder.TryGetLocalPath();
+            return string.IsNullOrWhiteSpace(path)
+                ? null
+                : new DINFO(path);
+        }
+
+
+
+        
 
         #endregion
 

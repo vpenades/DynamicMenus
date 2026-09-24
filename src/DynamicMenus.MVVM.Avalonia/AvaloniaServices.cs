@@ -20,6 +20,7 @@ namespace DynamicMenus
         public ICommand CreateFolderPickerCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> folderPickAsyncAction)
         {
             var options = new Avalonia.Platform.Storage.FolderPickerOpenOptions();
+            options.AllowMultiple = false;
             configure(new StorageDialogConfiguration(options));
             return CreateTopLevelCommand(cmdf, top => top._FolderPickAsync(options, folderPickAsyncAction));
         }
@@ -27,6 +28,7 @@ namespace DynamicMenus
         public ICommand CreateFileOpenCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> openFileAsyncAction)
         {
             var options = new Avalonia.Platform.Storage.FilePickerOpenOptions();
+            options.AllowMultiple = false;
             configure(new StorageDialogConfiguration(options));
             return CreateTopLevelCommand(cmdf, top => top._OpenFileAsync(options, openFileAsyncAction));
         }
@@ -111,14 +113,25 @@ namespace DynamicMenus
         public static StorageDialogConfiguration WithTitle(this StorageDialogConfiguration cfg, string title)
         {
             switch (cfg.Configuration)
-            {
-                case Avalonia.Platform.Storage.FilePickerOpenOptions read: read.Title = title; break;
-                case Avalonia.Platform.Storage.FilePickerSaveOptions write: write.Title = title; break;
-                case FolderPickerOpenOptions folder: folder.Title = title; break;
+            {                
+                case PickerOptions picker: picker.Title = title; break;
             }
 
             return cfg;
         }
+
+        public static StorageDialogConfiguration WithAllowMultipleSelection(this StorageDialogConfiguration cfg, bool enabled)
+        {
+            switch (cfg.Configuration)
+            {
+                case FilePickerOpenOptions read: read.AllowMultiple = enabled; break;
+                case FilePickerSaveOptions write: throw new InvalidOperationException("Not supported for save picker");
+                case FolderPickerOpenOptions folder: folder.AllowMultiple = folder.AllowMultiple = enabled; break;
+            }
+
+            return cfg;
+        }
+            
 
         public static StorageDialogConfiguration WithAllFilesExt(this StorageDialogConfiguration cfg)
         {
@@ -148,14 +161,14 @@ namespace DynamicMenus
 
             switch (cfg.Configuration)
             {
-                case Avalonia.Platform.Storage.FilePickerOpenOptions read:
+                case FilePickerOpenOptions read:
                     read.FileTypeFilter = _add(read.FileTypeFilter, ft);                    
                     break;
 
-                case Avalonia.Platform.Storage.FilePickerSaveOptions write:
+                case FilePickerSaveOptions write:
                     write.FileTypeChoices = _add(write.FileTypeChoices, ft);
                     break;
-                case Avalonia.Platform.Storage.FolderPickerOpenOptions:
+                case FolderPickerOpenOptions:
                     throw new InvalidOperationException("Not supported for folder picker");
             }
 
