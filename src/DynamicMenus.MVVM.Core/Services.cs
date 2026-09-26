@@ -8,19 +8,31 @@ using System.Windows.Input;
 
 namespace DynamicMenus
 {
+
     /// <summary>
     /// <see cref="ICommand"/> factory used by <see cref="MenuBuilder"/>
     /// </summary>
     public interface ICommandFactoryService
     {
         ICommand CreateCommand(Action action);
-
         ICommand CreateCommand<T>(Action<T?> action);
-
         ICommand CreateCommand(Func<Task> action);
-
         ICommand CreateCommand<T>(Func<T?, Task> action);
     }
+
+    public interface IHostServices
+    {
+        public Task OpenFileDialog<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> openFileAsyncAction);
+    }
+
+    public interface IHostServicesFactory
+    {
+        ICommand CreateHostServices(ICommandFactoryService cmdf, Func<IHostServices,Task> hostAction);
+    }
+        
+
+
+    
 
     /// <summary>
     /// <see cref="ICommand"/> factory used by <see cref="MenuBuilder"/>

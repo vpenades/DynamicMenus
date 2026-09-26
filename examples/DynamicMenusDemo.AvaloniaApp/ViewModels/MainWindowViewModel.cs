@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -32,10 +33,22 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
                 builder.Append("📁", "Pick directory...").WithFolderPicker<System.IO.DirectoryInfo>(cfg => cfg.WithTitle("Pick target folder"), async f => await System.Threading.Tasks.Task.CompletedTask).WithToolTip("Pick Folder"); ;
                 builder.Append("📁", "Pick directories...").WithFolderPicker<System.IO.DirectoryInfo[]>(cfg => cfg.WithTitle("Pick target folders").WithAllowMultipleSelection(true), async fff => await System.Threading.Tasks.Task.CompletedTask).WithToolTip("Pick Folders"); ;
                 builder.AppendSeparator();
+                builder.Append("📂", "Open File [WiP]...").WithHostServices(_HostServiceOpenFile).WithToolTip("Open File");
+                builder.AppendSeparator();
                 builder.Append("🚪", "Exit").WithCommand(()=> Environment.Exit(0));                
 
                 return builder.EnumerateMenuItems();
             }
+        }
+
+        private async Task _HostServiceOpenFile(IHostServices hsrv)
+        {
+            // not working yet
+            await hsrv.OpenFileDialog<System.IO.FileInfo>
+                (
+                cfg => cfg.WithTitle("Open File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt(),
+                async f => await System.Threading.Tasks.Task.CompletedTask
+                );
         }
 
         public IEnumerable<IMenuItemViewModel> EditMenu

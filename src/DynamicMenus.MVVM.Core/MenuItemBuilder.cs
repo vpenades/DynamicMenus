@@ -92,6 +92,12 @@ namespace DynamicMenus
             return WithCustomMenuItemFactory(new MenuItemParamCommandViewModel<T>.Factory(this, command, parameter));
         }
 
+        public MenuItemBuilder WithHostServices(Func<IHostServices, Task> hostServices)
+        {
+            var cmd = _Context._CreateHostServices(hostServices);
+            return WithCustomMenuItemFactory(new MenuItemSelfCommandViewModel.Factory(this, cmd));
+        }
+
         public virtual MenuItemBuilder WithFolderPicker<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> folderPickAction)
         {
             var cmd = _Context._CreateFolderPickCommand(configure, folderPickAction);

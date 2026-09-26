@@ -11,11 +11,31 @@ using Avalonia.Platform.Storage;
 
 namespace DynamicMenus
 {
-    public class AvaloniaDynamicMenuServices : IStorageCommandFactoryService, IClipboardCommandFactoryService
+    public class AvaloniaDynamicMenuServices
+        : IStorageCommandFactoryService
+        , IClipboardCommandFactoryService
+        , IHostServicesFactory
     {
+
+        #region lifecycle
         public static AvaloniaDynamicMenuServices Instance { get; } = new AvaloniaDynamicMenuServices();
 
         private AvaloniaDynamicMenuServices() { }
+
+        #endregion
+
+        public ICommand CreateHostServices(ICommandFactoryService cmdf, Func<IHostServices, Task> hostAction)
+        {
+            async Task _do(TopLevel tl)
+            {
+                var h = new AvaloniaHostServices(tl);
+                await hostAction(h);
+            }
+
+            return CreateTopLevelCommand(cmdf, _do);
+        }
+
+        #region commands
 
         public ICommand CreateFolderPickerCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> folderPickAsyncAction)
         {
@@ -105,7 +125,30 @@ namespace DynamicMenus
         public ICommand CreateTopLevelCommand(ICommandFactoryService cmdf, Func<TopLevel, Task> topLevelAction)
         {
             return cmdf.CreateCommand<Visual?>(visual => topLevelAction(visual._GetActualTopLevel()!));            
-        }        
+        }
+
+        
+
+        #endregion
+    }
+
+
+    public class AvaloniaHostServices : IHostServices
+    {
+        public AvaloniaHostServices(TopLevel tl)
+        {
+            _TopLevel = tl;
+        }
+
+        private readonly TopLevel _TopLevel;        
+
+        public async Task OpenFileDialog<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> openFileAsyncAction)
+        {
+            var options = new Avalonia.Platform.Storage.FilePickerOpenOptions();
+            options.AllowMultiple = false;
+            configure(new StorageDialogConfiguration(options));
+            await _TopLevel._OpenFileAsync(options, openFileAsyncAction);            
+        }
     }
 
     public static class StorageDialogConfigurationExtensions
