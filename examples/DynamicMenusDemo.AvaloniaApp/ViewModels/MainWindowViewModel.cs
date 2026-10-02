@@ -58,6 +58,10 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
             var d = await hsrv.PickFolderDialog<System.IO.DirectoryInfo>(cfg => cfg.WithTitle("Pick folder"));
 
             await MessageBoxManager.GetMessageBoxStandard("Caption", $"Picked folder {d.Name}", ButtonEnum.YesNo).ShowAsync();
+
+            var ddd = await hsrv.PickFolderDialog<System.IO.DirectoryInfo[]>(cfg => cfg.WithTitle("Pick folders").WithAllowMultipleSelection(true));
+
+            await MessageBoxManager.GetMessageBoxStandard("Caption", $"Picked folders {ddd.Length}", ButtonEnum.YesNo).ShowAsync();
         }
 
         public IEnumerable<IMenuItemViewModel> EditMenu

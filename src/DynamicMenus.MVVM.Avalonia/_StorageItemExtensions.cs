@@ -34,7 +34,7 @@ namespace DynamicMenus
             if (_TryConvert<T>(_ToDirectoryInfo(items.FirstOrDefault()), out var r4)) return (r4, true);
 
             var systemDirs = items.Select(_ToDirectoryInfo).Where(item => item != null).ToArray();
-            if (systemDirs.Length > 0 && _TryConvert<T>(systemDirs, out var r5)) return (r4, true);
+            if (systemDirs.Length > 0 && _TryConvert<T>(systemDirs, out var r5)) return (r5, true);
             
 
             throw new InvalidOperationException($"unable to cast collection of {typeof(IStorageFile).Name} into {typeof(T).Name}");
