@@ -17,8 +17,7 @@ namespace DynamicMenus
         public static void RegisterCommandsFactory(object commandsFactory)
         {
             if (commandsFactory is ICommandFactoryService cf) _DefaultCommandFactory = cf;
-            if (commandsFactory is IStorageCommandFactoryService scf) _DefaultStorageCommandFactory = scf;
-            if (commandsFactory is IClipboardCommandFactoryService ccf) _DefaultClipboardCommandFactory = ccf;
+            if (commandsFactory is IHostServicesFactory scf) _DefaultHostServiceFactory = scf;            
         }
 
         public MenuBuilder() { }
@@ -48,8 +47,7 @@ namespace DynamicMenus
 
         private readonly ICommandFactoryService? _CommandFactory;
         private static ICommandFactoryService? _DefaultCommandFactory;
-        private static IStorageCommandFactoryService? _DefaultStorageCommandFactory;
-        private static IClipboardCommandFactoryService? _DefaultClipboardCommandFactory;
+        private static IHostServicesFactory? _DefaultHostServiceFactory;        
 
         [System.Diagnostics.DebuggerBrowsable(System.Diagnostics.DebuggerBrowsableState.RootHidden)]
         private readonly List<MenuItemBuilder> _Items = new List<MenuItemBuilder>();
@@ -175,30 +173,48 @@ namespace DynamicMenus
                 ?? throw new NotImplementedException($"{nameof(ICommandFactoryService)} not found.\r\nEither pass one to {nameof(MenuBuilder)}'s constructor,\r\nor register a default one with {nameof(MenuBuilder)}.{nameof(RegisterCommandsFactory)} at application startup.");
         }
 
-        internal ICommand _CreateHostServices(Func<IHostServices,Task> hsrv)
+        
+
+        internal ICommand _CreateFolderPickCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> folderPickAction)
         {
-            var fff = GetStorageCommandFactory() as IHostServicesFactory;
-            return fff.CreateHostServices(GetCommandFactory(), hsrv);
+            return GetHostServiceFactory().CreateFolderPickerCommand(GetCommandFactory(), configure, folderPickAction);
         }
 
-        internal ICommand _CreateFolderPickCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> folderPickAction) => GetStorageCommandFactory().CreateFolderPickerCommand(GetCommandFactory(), configure, folderPickAction);
-        internal ICommand _CreateFileOpenCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> fileOpenAction) => GetStorageCommandFactory().CreateFileOpenCommand(GetCommandFactory(), configure, fileOpenAction);
-        internal ICommand _CreateFileSaveCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> fileSaveAction) => GetStorageCommandFactory().CreateFileSaveCommand(GetCommandFactory(), configure, fileSaveAction);
-        private IStorageCommandFactoryService GetStorageCommandFactory()
+        internal ICommand _CreateFileOpenCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> fileOpenAction)
         {
-            return _Parent?.GetStorageCommandFactory()                
-                ?? _DefaultStorageCommandFactory
-                ?? throw new NotImplementedException($"{nameof(IStorageCommandFactoryService)} not found.\r\nEither pass one to {nameof(MenuBuilder)}'s constructor,\r\nor register a default one with {nameof(MenuBuilder)}.{nameof(RegisterCommandsFactory)} at application startup.");
+            return GetHostServiceFactory().CreateFileOpenCommand(GetCommandFactory(), configure, fileOpenAction);
         }
 
-        internal ICommand _CreateGetClipboardCommand<T>(Action<T> setValueFromClipboard) => GetClipboardCommandFactory().CreateGetClipboardCommand(GetCommandFactory(), setValueFromClipboard);
-        internal ICommand _CreateSetClipboardCommand<T>(Func<T?> getValueToCopyToClipboard) => GetClipboardCommandFactory().CreateSetClipboardCommand(GetCommandFactory(), getValueToCopyToClipboard);
-        private IClipboardCommandFactoryService GetClipboardCommandFactory()
+        internal ICommand _CreateFileSaveCommand<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> fileSaveAction)
         {
-            return _Parent?.GetClipboardCommandFactory()
-                ?? _DefaultClipboardCommandFactory
-                ?? throw new NotImplementedException($"{nameof(IClipboardCommandFactoryService)} not found.\r\nEither pass one to {nameof(MenuBuilder)}'s constructor,\r\nor register a default one with {nameof(MenuBuilder)}.{nameof(RegisterCommandsFactory)} at application startup.");
+            return GetHostServiceFactory().CreateFileSaveCommand(GetCommandFactory(), configure, fileSaveAction);
         }
+
+        
+
+        internal ICommand _CreateGetClipboardCommand<T>(Action<T> setValueFromClipboard)
+        {
+            return GetHostServiceFactory().CreateGetClipboardCommand(GetCommandFactory(), setValueFromClipboard);
+        }
+
+        internal ICommand _CreateSetClipboardCommand<T>(Func<T?> getValueToCopyToClipboard)
+        {
+            return GetHostServiceFactory().CreateSetClipboardCommand(GetCommandFactory(), getValueToCopyToClipboard);
+        }
+
+
+        internal ICommand _CreateHostServices(Func<IHostServices, Task> hsrv)
+        {
+            return GetHostServiceFactory().CreateHostServicesCommand(GetCommandFactory(), hsrv);
+        }
+
+        private IHostServicesFactory GetHostServiceFactory()
+        {
+            return _Parent?.GetHostServiceFactory()
+                ?? _DefaultHostServiceFactory
+                ?? throw new NotImplementedException($"{nameof(IHostServicesFactory)} not found.\r\nEither pass one to {nameof(MenuBuilder)}'s constructor,\r\nor register a default one with {nameof(MenuBuilder)}.{nameof(RegisterCommandsFactory)} at application startup.");
+        }
+
 
         #endregion
     }    

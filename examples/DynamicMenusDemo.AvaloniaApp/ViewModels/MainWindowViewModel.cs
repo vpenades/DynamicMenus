@@ -7,6 +7,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicMenus;
 using DynamicMenus.ViewModels;
 
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+
 namespace DynamicMenusDemo.AvaloniaApp.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
@@ -16,7 +19,7 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
             // Before using the MenuBuilder we need to register the ICommand factory services:
 
             MenuBuilder.RegisterCommandsFactory(CommunityToolkitDynamicMenuServices.Instance);
-            MenuBuilder.RegisterCommandsFactory(AvaloniaDynamicMenuServices.Instance);
+            MenuBuilder.RegisterCommandsFactory(AvaloniaHostServices.Instance);
         }
 
         [ObservableProperty]
@@ -33,7 +36,7 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
                 builder.Append("📁", "Pick directory...").WithFolderPicker<System.IO.DirectoryInfo>(cfg => cfg.WithTitle("Pick target folder"), async f => await System.Threading.Tasks.Task.CompletedTask).WithToolTip("Pick Folder"); ;
                 builder.Append("📁", "Pick directories...").WithFolderPicker<System.IO.DirectoryInfo[]>(cfg => cfg.WithTitle("Pick target folders").WithAllowMultipleSelection(true), async fff => await System.Threading.Tasks.Task.CompletedTask).WithToolTip("Pick Folders"); ;
                 builder.AppendSeparator();
-                builder.Append("📂", "Open File [WiP]...").WithHostServices(_HostServiceOpenFile).WithToolTip("Open File");
+                builder.Append("📂", "Host services...").WithHostServices(_HostServiceOpenFile).WithToolTip("Tests multiple host services in sequence");
                 builder.AppendSeparator();
                 builder.Append("🚪", "Exit").WithCommand(()=> Environment.Exit(0));                
 
@@ -43,12 +46,18 @@ namespace DynamicMenusDemo.AvaloniaApp.ViewModels
 
         private async Task _HostServiceOpenFile(IHostServices hsrv)
         {
-            // not working yet
-            await hsrv.OpenFileDialog<System.IO.FileInfo>
-                (
-                cfg => cfg.WithTitle("Open File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt(),
-                async f => await System.Threading.Tasks.Task.CompletedTask
-                );
+            
+            var f = await hsrv.OpenFileDialog<System.IO.FileInfo>(cfg => cfg.WithTitle("Open File").WithExtension("Image File", "*.png", "*.jpg").WithAllFilesExt());
+
+            await MessageBoxManager.GetMessageBoxStandard("Caption", $"Opened file {f.Name}", ButtonEnum.YesNo).ShowAsync();
+
+            f = await hsrv.SavefileDialog<System.IO.FileInfo>(cfg => cfg.WithTitle("Save File").WithExtension("Image File", "*.png", "*.jpg"));
+
+            await MessageBoxManager.GetMessageBoxStandard("Caption", $"Saved file {f.Name}", ButtonEnum.YesNo).ShowAsync();
+
+            var d = await hsrv.PickFolderDialog<System.IO.DirectoryInfo>(cfg => cfg.WithTitle("Pick folder"));
+
+            await MessageBoxManager.GetMessageBoxStandard("Caption", $"Picked folder {d.Name}", ButtonEnum.YesNo).ShowAsync();
         }
 
         public IEnumerable<IMenuItemViewModel> EditMenu

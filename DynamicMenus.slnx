@@ -13,6 +13,9 @@
     <Project Path="src/DynamicMenus.MVVM.Avalonia/DynamicMenus.MVVM.Avalonia.csproj" />
     <Project Path="src/DynamicMenus.MVVM.Core/DynamicMenus.MVVM.Core.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DynamicMenus.MVVM.Avalonia.Tests/DynamicMenus.MVVM.Avalonia.Tests.csproj" />
+  </Folder>
   <Folder Name="/Workflows/">
     <File Path=".github/workflows/build_and_test.yml" />
     <File Path=".github/workflows/publish_tag_to_nuget.yml" />

@@ -9,7 +9,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Avalonia" />
-	</ItemGroup>	
+	</ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="DynamicMenus.MVVM.Avalonia.Tests"/>
+  </ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\DynamicMenus.MVVM.Core\DynamicMenus.MVVM.Core.csproj" />

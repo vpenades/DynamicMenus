@@ -7,152 +7,135 @@ using System.Windows.Input;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 
 namespace DynamicMenus
 {
-    public class AvaloniaDynamicMenuServices
-        : IStorageCommandFactoryService
-        , IClipboardCommandFactoryService
-        , IHostServicesFactory
+    /// <summary>
+    /// Avalonia implementation for <see cref="IHostServicesFactory"/>
+    /// </summary>
+    public class AvaloniaHostServices : IHostServicesFactory
     {
-
         #region lifecycle
-        public static AvaloniaDynamicMenuServices Instance { get; } = new AvaloniaDynamicMenuServices();
+        public static AvaloniaHostServices Instance { get; } = new AvaloniaHostServices();
 
-        private AvaloniaDynamicMenuServices() { }
+        private AvaloniaHostServices() { }
 
         #endregion
 
-        public ICommand CreateHostServices(ICommandFactoryService cmdf, Func<IHostServices, Task> hostAction)
+        #region API
+
+        public ICommand CreateHostServicesCommand(ICommandFactoryService cmdf, Func<IHostServices, Task> hostAction)
         {
             async Task _do(TopLevel tl)
             {
-                var h = new AvaloniaHostServices(tl);
+                var h = new _AvaloniaHostServices(tl);
                 await hostAction(h);
             }
 
             return CreateTopLevelCommand(cmdf, _do);
         }
 
-        #region commands
-
-        public ICommand CreateFolderPickerCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> folderPickAsyncAction)
-        {
-            var options = new Avalonia.Platform.Storage.FolderPickerOpenOptions();
-            options.AllowMultiple = false;
-            configure(new StorageDialogConfiguration(options));
-            return CreateTopLevelCommand(cmdf, top => top._FolderPickAsync(options, folderPickAsyncAction));
-        }
-
-        public ICommand CreateFileOpenCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> openFileAsyncAction)
-        {
-            var options = new Avalonia.Platform.Storage.FilePickerOpenOptions();
-            options.AllowMultiple = false;
-            configure(new StorageDialogConfiguration(options));
-            return CreateTopLevelCommand(cmdf, top => top._OpenFileAsync(options, openFileAsyncAction));
-        }
-
-        public ICommand CreateFileSaveCommand<T>(ICommandFactoryService cmdf, Action<StorageDialogConfiguration> configure, Func<T,Task> saveFileAsyncAction)
-        {
-            var options = new Avalonia.Platform.Storage.FilePickerSaveOptions();
-            configure(new StorageDialogConfiguration(options));
-            return CreateTopLevelCommand(cmdf, top => top._SaveFileAsync(options, saveFileAsyncAction));
-        }
-
-        public ICommand CreateGetClipboardCommand<T>(ICommandFactoryService cmdf, Action<T> setValueFromClipboard)
-        {
-            if (typeof(T) == typeof(string))
-            {
-                void setText(string clipboardText)
-                {
-                    if (clipboardText is T value) setValueFromClipboard(value);
-                }
-                
-                return CreateTopLevelCommand(cmdf, top => top._CopyTextFromClipboard(setText));
-            }
-
-            throw new NotImplementedException();            
-        }
-
-        public ICommand CreateGetClipboardCommand<T>(ICommandFactoryService cmdf, Func<T,Task> setValueFromClipboard)
-        {
-            if (typeof(T) == typeof(string))
-            {
-                async Task setText(string clipboardText)
-                {
-                    if (clipboardText is T value) await setValueFromClipboard(value);
-                }
-
-                return CreateTopLevelCommand(cmdf, top => top._CopyTextFromClipboard(setText));
-            }
-
-            throw new NotImplementedException();
-        }
-
-        public ICommand CreateSetClipboardCommand<T>(ICommandFactoryService cmdf, Func<T?> getValueToCopyToClipboard)
-        {
-            if (typeof(T) == typeof(string))
-            {
-                string getText()
-                {
-                    var value = getValueToCopyToClipboard();
-                    return value as string ?? string.Empty;
-                }
-
-                return CreateTopLevelCommand(cmdf, top => top._CopyTextToClipboard(getText));
-            }
-
-            throw new NotImplementedException();
-        }
-
-        public ICommand CreateSetClipboardCommand<T>(ICommandFactoryService cmdf, Func<Task<T?>> getValueToCopyToClipboard)
-        {
-            if (typeof(T) == typeof(string))
-            {
-                async Task<string> getText()
-                {
-                    var value = await getValueToCopyToClipboard();
-                    return value as string ?? string.Empty;
-                }
-
-                return CreateTopLevelCommand(cmdf, top => top._CopyTextToClipboard(getText));
-            }
-
-            throw new NotImplementedException();
-        }
-
         public ICommand CreateTopLevelCommand(ICommandFactoryService cmdf, Func<TopLevel, Task> topLevelAction)
         {
-            return cmdf.CreateCommand<Visual?>(visual => topLevelAction(visual._GetActualTopLevel()!));            
+            return cmdf.CreateCommand<Visual?>(visual => topLevelAction(visual._GetActualTopLevel()!));
         }
-
-        
 
         #endregion
     }
 
-
-    public class AvaloniaHostServices : IHostServices
+    /// <summary>
+    /// Avalonia implementation for <see cref="IHostServices"/>
+    /// </summary>
+    class _AvaloniaHostServices : IHostServices
     {
-        public AvaloniaHostServices(TopLevel tl)
+        #region lifecycle
+        public _AvaloniaHostServices(TopLevel tl)
         {
             _TopLevel = tl;
         }
 
-        private readonly TopLevel _TopLevel;        
+        #endregion
 
-        public async Task OpenFileDialog<T>(Action<StorageDialogConfiguration> configure, Func<T, Task> openFileAsyncAction)
+        #region data
+
+        private readonly TopLevel _TopLevel;
+
+        #endregion
+
+        #region storage APIs
+
+        public async Task<T?> OpenFileDialog<T>(Action<StorageDialogConfiguration> configure)
         {
             var options = new Avalonia.Platform.Storage.FilePickerOpenOptions();
             options.AllowMultiple = false;
+            options.Title = "Open file";
             configure(new StorageDialogConfiguration(options));
-            await _TopLevel._OpenFileAsync(options, openFileAsyncAction);            
+
+            return await _TopLevel._OpenFileAsync<T>(options);            
         }
+
+        public async Task<T?> SavefileDialog<T>(Action<StorageDialogConfiguration> configure)
+        {
+            var options = new Avalonia.Platform.Storage.FilePickerSaveOptions();
+            options.Title = "Save file";
+            configure(new StorageDialogConfiguration(options));
+
+            return await _TopLevel._SaveFileAsync<T>(options);
+        }
+
+        public async Task<T?> PickFolderDialog<T>(Action<StorageDialogConfiguration> configure)
+        {
+            var options = new Avalonia.Platform.Storage.FolderPickerOpenOptions();
+            options.AllowMultiple = false;
+            options.Title = "Pick folder";
+            configure(new StorageDialogConfiguration(options));
+
+            return await _TopLevel._PickFolderAsync<T>(options);
+        }
+
+        #endregion
+
+        #region clipboard
+
+        public async Task<T?> GetClipboardAsync<T>()
+        {
+            var clipboard = _TopLevel.Clipboard;
+            if (clipboard == null) return default;
+
+            if (typeof(T) == typeof(string))
+            {
+                var text = await clipboard.TryGetTextAsync();
+                if (text == null) return default;
+
+                if (text is T result) return result;
+            }
+
+            throw new NotImplementedException();
+        }        
+
+        public async Task SetClipboardAsync<T>(T? value)
+        {
+            var clipboard = _TopLevel.Clipboard;
+            if (clipboard == null) return;
+
+            switch(value)
+            {
+                case null: await clipboard.ClearAsync(); return;
+                case string text: await clipboard.SetTextAsync(text); return;
+            }
+
+            throw new NotImplementedException();
+        }        
+
+        #endregion
     }
 
     public static class StorageDialogConfigurationExtensions
     {
+        // ToDo: this is not framework agnostic at all
+
         public static StorageDialogConfiguration WithTitle(this StorageDialogConfiguration cfg, string title)
         {
             switch (cfg.Configuration)
